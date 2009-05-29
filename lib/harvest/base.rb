@@ -55,6 +55,12 @@ module Harvest
       Harvest::Resources::Invoice
     end
 
+    # Timesheet
+    # Harvest's timecard/daily API
+    def timesheet
+      Harvest::Resources::Timer
+    end
+
     private
     
       # Configure resource base class so that 
