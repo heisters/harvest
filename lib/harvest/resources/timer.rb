@@ -41,7 +41,7 @@ module Harvest
           :hours => attributes['hours'].to_s,
           :project_id => (project ? project.id : nil),
           :task_id => (task ? task.id : nil),
-          :spent_at => Date.today
+          :spent_at => attributes['spent_at'] || Date.today
         }
         self.class.format.encode(massaged_attributes, {:root => 'request'}.merge(options))
       end
