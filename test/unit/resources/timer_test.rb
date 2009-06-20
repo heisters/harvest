@@ -19,11 +19,17 @@ class TimerTest < Test::Unit::TestCase
   end
 
   def mock_responses
+    @headers = {
+      'Accept' => 'application/xml'
+    }
+    @post_headers = {
+      'Content-Type' => 'application/xml; charset=utf-8',
+    }.merge @headers
     ActiveResource::HttpMock.respond_to do |mock|
-      mock.get    "/daily/show/1",        {}, @timer_xml,   200
-      mock.post   "/daily/add",           {}, @timer_xml,   201, "Location" => "/daily/show/2"
-      mock.post   "/daily/update/1",      {}, nil,          200
-      mock.delete "/daily/delete/1",      {}, nil,          200
+      mock.get    "/daily/show/1",        @headers,       @timer_xml,   200
+      mock.post   "/daily/add",           @post_headers,  @timer_xml,   201, "Location" => "/daily/show/2"
+      mock.post   "/daily/update/1",      @post_headers,  nil,          200
+      mock.delete "/daily/delete/1",      @headers,       nil,          200
 
       mock.get    "/projects.xml",        {}, @projects
       mock.get    "/projects/1.xml",      {}, @project_xml
@@ -54,7 +60,7 @@ class TimerTest < Test::Unit::TestCase
     should "create a new timer" do
       timer = Harvest::Resources::Timer.new(:hours => 5)
       timer.save
-      expected_request = ActiveResource::Request.new(:post, "/daily/add")
+      expected_request = ActiveResource::Request.new(:post, "/daily/add", timer.encode, @post_headers)
       assert ActiveResource::HttpMock.requests.include?(expected_request)
     end
 
@@ -62,7 +68,7 @@ class TimerTest < Test::Unit::TestCase
       timer = Harvest::Resources::Timer.find(1)
       timer.hours = 10
       timer.save
-      expected_request = ActiveResource::Request.new(:post, "/daily/update/1")
+      expected_request = ActiveResource::Request.new(:post, "/daily/update/1", timer.encode, @post_headers)
       assert ActiveResource::HttpMock.requests.include?(expected_request)
     end
 

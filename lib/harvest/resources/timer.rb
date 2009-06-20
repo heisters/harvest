@@ -9,7 +9,8 @@ module Harvest
 
       # Override to not use collection_path
       def create
-        connection.post('/daily/add', encode, self.class.headers).tap do |response|
+        headers = self.class.headers.merge 'Accept' => 'application/xml'
+        connection.post('/daily/add', encode, headers).tap do |response|
           self.id = id_from_response(response)
           load_attributes_from_response(response)
         end
@@ -17,7 +18,8 @@ module Harvest
 
       # Override to use POST instead of PUT, and update path
       def update
-        connection.post(element_path(prefix_options.merge(:action_hack => :update)), encode, self.class.headers).tap do |response|
+        headers = self.class.headers.merge 'Accept' => 'application/xml'
+        connection.post(element_path(prefix_options.merge(:action_hack => :update)), encode, headers).tap do |response|
           load_attributes_from_response(response)
         end
       end
